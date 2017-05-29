@@ -1,6 +1,7 @@
 
 import { createAction, handleActions } from 'redux-actions';
 import makeDebug from 'debug';
+import { Map, fromJS } from 'immutable';
 
 /**
  * Build a Redux compatible wrapper around a Feathers service.
@@ -95,8 +96,7 @@ const reduxifyService = (app, route, name = route, options = {}) => {
     // promise has been started
     [`${actionType}_${opts.PENDING}`]: (state, action) => {
       debug(`redux:${actionType}_${opts.PENDING}`, action);
-      return ({
-        ...state,
+      return state.merge({
         [opts.isError]: null,
         [opts.isLoading]: ifLoading,
         [opts.isSaving]: !ifLoading,
@@ -109,31 +109,29 @@ const reduxifyService = (app, route, name = route, options = {}) => {
     // promise resolved
     [`${actionType}_${opts.FULFILLED}`]: (state, action) => {
       debug(`redux:${actionType}_${opts.FULFILLED}`, action);
-      return {
-        ...state,
+      return state.merge({
         [opts.isError]: null,
         [opts.isLoading]: false,
         [opts.isSaving]: false,
         [opts.isFinished]: true,
-        [opts.data]: !isFind ? action.payload : null,
-        [opts.queryResult]: isFind ? action.payload : (state[opts.queryResult] || null),
-      };
+        [opts.data]: !isFind ? fromJS(action.payload) : null,
+        [opts.queryResult]: isFind ? fromJS(action.payload) : (state[opts.queryResult] || null),
+      });
     },
 
     // promise rejected
     [`${actionType}_${opts.REJECTED}`]: (state, action) => {
       debug(`redux:${actionType}_${opts.REJECTED}`, action);
-      return {
-        ...state,
+      return state.merge({
         // action.payload = { name: "NotFound", message: "No record found for id 'G6HJ45'",
         //   code:404, className: "not-found" }
-        [opts.isError]: action.payload,
+        [opts.isError]: fromJS(action.payload),
         [opts.isLoading]: false,
         [opts.isSaving]: false,
         [opts.isFinished]: true,
         [opts.data]: null,
         [opts.queryResult]: isFind ? null : (state[opts.queryResult] || null),
-      };
+      });
     },
   });
 
@@ -150,15 +148,16 @@ const reduxifyService = (app, route, name = route, options = {}) => {
   return {
     // ACTION CREATORS
     // Note: action.payload in reducer will have the value of .data below
-    find: createAction(FIND, (p) => ({ promise: service.find(p), data: undefined })),
-    get: createAction(GET, (id, p) => ({ promise: service.get(id, p) })),
-    create: createAction(CREATE, (d, p) => ({ promise: service.create(d, p) })),
-    update: createAction(UPDATE, (id, d, p) => ({ promise: service.update(id, d, p) })),
-    patch: createAction(PATCH, (id, d, p) => ({ promise: service.patch(id, d, p) })),
-    remove: createAction(REMOVE, (id, p) => ({ promise: service.remove(id, p) })),
-    reset: createAction(RESET),
-    on: (event, data, fcn) => (dispatch, getState) => { fcn(event, data, dispatch, getState); },
-
+    actions: {
+      find: createAction(FIND, (p) => ({ promise: service.find(p), data: undefined })),
+      get: createAction(GET, (id, p) => ({ promise: service.get(id, p) })),
+      create: createAction(CREATE, (d, p) => ({ promise: service.create(d, p) })),
+      update: createAction(UPDATE, (id, d, p) => ({ promise: service.update(id, d, p) })),
+      patch: createAction(PATCH, (id, d, p) => ({ promise: service.patch(id, d, p) })),
+      remove: createAction(REMOVE, (id, p) => ({ promise: service.remove(id, p) })),
+      reset: createAction(RESET),
+      on: (event, data, fcn) => (dispatch, getState) => { fcn(event, data, dispatch, getState); },
+    },
     // REDUCER
 
     reducer: handleActions(
@@ -189,14 +188,14 @@ const reduxifyService = (app, route, name = route, options = {}) => {
           };
         } }
       ),
-      {
+      Map({
         [opts.isError]: null,
         [opts.isLoading]: false,
         [opts.isSaving]: false,
         [opts.isFinished]: false,
         [opts.data]: null,
         [opts.queryResult]: null,
-      }
+      })
     ),
   };
 };

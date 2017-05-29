@@ -1,7 +1,7 @@
 {
-  "name": "feathers-reduxify-services",
+  "name": "feathers-reduxify-services-immutable",
   "version": "1.0.0",
-  "description": "Wrap Feathers services so they work transparently and perfectly with Redux.",
+  "description": "Wrap Feathers services so they work transparently and perfectly with Redux and Immutable.js.",
   "main": "lib/",
   "directories": {
     "lib": "lib"
@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eddyystop/feathers-reduxify-services.git"
+    "url": "git+https://github.com/CypherAlmasy/feathers-reduxify-services-immutable.git"
   },
   "keywords": [
     "feathers",
@@ -38,16 +38,21 @@
     "redux",
     "action creator",
     "actioncreator",
-    "reducer"
+    "reducer",
+    "immutable"
   ],
   "author": "John Szwaronek <johnsz9999@gmail.com>",
+  "contributors": [
+    "Matthew Weir <matt@mattweir.com>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/eddyystop/feathers-reduxify-services/issues"
   },
-  "homepage": "https://github.com/eddyystop/feathers-reduxify-services#readme",
+  "homepage": "https://github.com/CypherAlmasy/feathers-reduxify-services-immutable",
   "dependencies": {
     "debug": "2.6.3",
+    "immutable": "^3.8.1",
     "redux-actions": "2.0.2"
   },
   "devDependencies": {
@@ -75,5 +80,6 @@
   },
   "engines": {
     "node": ">= 4.6.0"
-  }
+  },
+  "private": true
 }
