@@ -145,6 +145,15 @@ const reduxifyService = (app, route, name = route, options = {}) => {
   const REMOVE = `${SERVICE_NAME}REMOVE`;
   const RESET = `${SERVICE_NAME}RESET`;
 
+  const initialState = Map({
+    [opts.isError]: null,
+    [opts.isLoading]: false,
+    [opts.isSaving]: false,
+    [opts.isFinished]: false,
+    [opts.data]: null,
+    [opts.queryResult]: null,
+  });
+
   return {
     // ACTION CREATORS
     // Note: action.payload in reducer will have the value of .data below
@@ -158,8 +167,10 @@ const reduxifyService = (app, route, name = route, options = {}) => {
       reset: createAction(RESET),
       on: (event, data, fcn) => (dispatch, getState) => { fcn(event, data, dispatch, getState); },
     },
-    // REDUCER
 
+    initialState,
+
+    // REDUCER
     reducer: handleActions(
       Object.assign({},
         reducerForServiceMethod(FIND, true, true),
@@ -187,16 +198,7 @@ const reduxifyService = (app, route, name = route, options = {}) => {
             [opts.queryResult]: action.payload ? state[opts.queryResult] : null,
           };
         } }
-      ),
-      Map({
-        [opts.isError]: null,
-        [opts.isLoading]: false,
-        [opts.isSaving]: false,
-        [opts.isFinished]: false,
-        [opts.data]: null,
-        [opts.queryResult]: null,
-      })
-    ),
+      ), initialState),
   };
 };
 
